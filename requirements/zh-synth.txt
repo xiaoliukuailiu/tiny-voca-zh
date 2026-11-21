@@ -1,0 +1,10 @@
+# Environment A: synthetic corpus generation (needs a CUDA GPU).
+# Keep this separate from the training environment: qwen-tts pins its own torch.
+qwen-tts
+modelscope>=1.20
+huggingface-hub>=0.34
+soundfile>=0.12
+scipy>=1.10
+numpy>=1.24,<3
+# Optional, only for `--stage screen` in make_zh_dataset.py.
+faster-whisper>=1.0

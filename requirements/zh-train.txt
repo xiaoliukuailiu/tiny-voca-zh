@@ -1,0 +1,21 @@
+# Environment C: feature preparation, annotation, training, evaluation.
+#
+# Install torch FIRST, from the CUDA 12.8 wheel index. RTX 50xx (Blackwell,
+# sm_120) is not supported by CUDA 12.1/12.4 builds, and the failure only shows
+# up when the first kernel launches.
+#
+#   pip install torch --index-url https://download.pytorch.org/whl/cu128
+#
+# Then:
+#   pip install -r requirements/zh-train.txt
+#   pip install -e .
+torch>=2.7,<3
+numpy>=1.24,<3
+soundfile>=0.12,<1
+librosa>=0.10.2,<1
+pyarrow>=15
+pypinyin>=0.53
+scipy>=1.10,<2
+transformers>=4.40,<5
+faster-whisper>=1.0,<2
+jiwer>=3,<5

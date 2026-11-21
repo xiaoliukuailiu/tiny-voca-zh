@@ -1,0 +1,16 @@
+{"id": "2241295d8b58dfe5", "text": "周末，他在医院搬走了那把旧椅子。", "reasons": ["ValueError: characters not in the aligner vocabulary: ['椅']"]}
+{"id": "f290ed9dabe05387", "text": "周末，他在医院搬走了那把旧椅子。", "reasons": ["ValueError: characters not in the aligner vocabulary: ['椅']"]}
+{"id": "87629b66fbf67548", "text": "虽然那把椅子出乎意料地简单，但是同事还是决定留着。", "reasons": ["ValueError: characters not in the aligner vocabulary: ['椅']"]}
+{"id": "51c043d8cbb92ea7", "text": "虽然那把椅子出乎意料地简单，但是同事还是决定留着。", "reasons": ["ValueError: characters not in the aligner vocabulary: ['椅']"]}
+{"id": "5e8bf8696b141686", "text": "下午，老师在河边搬走了那把旧椅子。", "reasons": ["ValueError: characters not in the aligner vocabulary: ['椅']"]}
+{"id": "5b87b36afdb8718b", "text": "下午，老师在河边搬走了那把旧椅子。", "reasons": ["ValueError: characters not in the aligner vocabulary: ['椅']"]}
+{"id": "813eb769277ea2b8", "text": "虽然那把椅子非常有趣，但是我们还是决定留着。", "reasons": ["ValueError: characters not in the aligner vocabulary: ['椅']"]}
+{"id": "5d537fb7f8a306b8", "text": "虽然那把椅子非常有趣，但是我们还是决定留着。", "reasons": ["ValueError: characters not in the aligner vocabulary: ['椅']"]}
+{"id": "6b645e739594dc77", "text": "大家耐心地搬走了那把旧椅子。", "reasons": ["ValueError: characters not in the aligner vocabulary: ['椅']"]}
+{"id": "32fa199893d4a8ff", "text": "大家耐心地搬走了那把旧椅子。", "reasons": ["ValueError: characters not in the aligner vocabulary: ['椅']"]}
+{"id": "5e7589213af44c90", "text": "明年，他在阳台上搬走了那把旧椅子。", "reasons": ["ValueError: characters not in the aligner vocabulary: ['椅']"]}
+{"id": "a78955bc705b9fe4", "text": "朱杰匆忙地关上了门。", "reasons": ["ValueError: characters not in the aligner vocabulary: ['匆']"]}
+{"id": "c07bc6b14c605d95", "text": "朱杰匆忙地关上了门。", "reasons": ["ValueError: characters not in the aligner vocabulary: ['匆']"]}
+{"id": "d6a91a8e9da9bc11", "text": "明年，他在阳台上搬走了那把旧椅子。", "reasons": ["ValueError: characters not in the aligner vocabulary: ['椅']"]}
+{"id": "3c7afc351eecb2e2", "text": "黄芳匆忙地研究了这个问题。", "reasons": ["ValueError: characters not in the aligner vocabulary: ['匆']"]}
+{"id": "911ac5986e6108d2", "text": "黄芳匆忙地研究了这个问题。", "reasons": ["ValueError: characters not in the aligner vocabulary: ['匆']"]}
