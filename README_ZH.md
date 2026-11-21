@@ -26,7 +26,58 @@ pip install torch --index-url https://download.pytorch.org/whl/cu128   # torch >
 
 ---
 
-## 2. 目录
+## 2. 本次训练快照（2026-11-17/18，双 RTX 5090）
+
+### 数据
+
+- 文本：20000 句、约 22 小时中文语料，由 Qwen3-TTS 1.7B VoiceDesign 合成**双音色**各一遍：ZH_F1（女声）、ZH_M1（男声），无真人录音。
+- 划分（按文本切分，无泄漏）：train 37,672 / validation 464 / test 304。
+
+### 模型配置（config/zh.json）
+
+| 项 | 值 |
+|---|---|
+| 推理参数 | 4,564,555（18 MB），训练另有 2.69M（判别器等） |
+| 词汇表 | 218 tokens（声母/韵母带调 + 标点） |
+| 结构 | encoder 4×192 / 4 头 · prosody 2 层 · acoustic 5 层 · predictor 128 |
+| 采样率 | 24 kHz |
+
+### 训练超参（runs/zh/recipe.json）
+
+| 项 | 值 |
+|---|---|
+| 优化器 | AdamW，lr 3e-4，warmup 1000 步，半衰 100k 步 |
+| batch | batch_frames 9000 / max_batch 32 |
+| GAN | 8000 步起，gan_ratio 0.7 |
+| Teacher（真实韵律） | hold 3000 → ramp 7000 → 10000 步后完全自预测 |
+| seed | 20261113 |
+
+### 训练时间线（单卡 RTX 5090）
+
+| 时刻 | 进度 |
+|---|---|
+| 11/17 18:34 | 8000 步 |
+| 11/17 19:10 | 20000 步 |
+| 11/17 21:45 | 30000 步（中间中断约 2.5 h） |
+| 11/17 23:38 | 60000 步（此后中断，从 59000 步 resume） |
+| 11/18 02:12 | 104000 步完成，导出 inference.pt |
+
+纯 GPU 训练时间约 **5.8 小时**（4.8~5.2 步/秒；resume 段 59k→104k 用时 9423 s），墙钟约 8.5 小时（含中断）。评测约 20 分钟。
+
+### 最终评估（faster-whisper small，CER，free-running）
+
+| 集合 | 生成 CER | 参考音频 CER |
+|---|---|---|
+| validation | 17.2%（F1 12.3% / M1 22.1%） | 11.0% |
+| test | 23.5% | 17.0% |
+| novel 句子 | 31.5% | — |
+
+韵律指标（验证集）：pitch_error 1.31 半音、voicing_accuracy 96.6%、时长比 0.93（生成略快）。
+CPU 推理 >10× 实时（0.44 s 合成 5.9 s 音频）。
+
+---
+
+## 3. 目录
 
 ```
 tiny-voca/
@@ -53,7 +104,7 @@ tiny-voca/
 
 ---
 
-## 3. 环境
+## 4. 环境
 
 ### A. 合成（GPU）
 
@@ -93,7 +144,7 @@ pip install -e .
 
 ---
 
-## 4. 跑起来
+## 5. 跑起来
 
 ### Windows（PowerShell，原生）
 
@@ -185,22 +236,22 @@ python -m tiny_voca.infer --checkpoint runs/zh/inference.pt --voice ZH_F1 --text
 
 ---
 
-## 5. 各阶段产物与耗时（单卡 5090）
+## 6. 各阶段产物与耗时（双卡 5090）
 
 | 阶段 | 产物 | 估计耗时 | 占用 |
 |---|---|---|---|
-| 合成 20000 句 × 2 音色 | `data/zh-corpus/wav/*.wav` + `corpus.jsonl` | 2–5 h | 3.8 GB |
+| 合成 20000 句 × 2 音色 | `data/zh-corpus/wav/*.wav` + `corpus.jsonl` | 双卡并行（F1→cuda:0，M1→cuda:1），数小时 | 3.8 GB |
 | 特征提取 | `features/{train,val,test}.jsonl` + `.pt` | 1–2 h | ~10 GB |
 | 对齐 | ctc：在 annotate 内完成；MFA：`mfa-out/<split>/<id>.TextGrid` | ctc 10–30 min（GPU），MFA 1–3 h（CPU） | — |
 | 标注 | `annotations/*.jsonl` | 数分钟 | 小 |
-| 训练 | `runs/zh/inference.pt` | 8–12 h | 小 |
-| 评测 | `eval/zh/report.json` + 音频 | 20 min | 小 |
+| 训练 | `runs/zh/inference.pt` | **~5.8 h GPU**（104k 步，实测 4.8~5.2 步/秒，单卡） | 小 |
+| 评测 | `eval/zh/report.json` + 音频 | ~20 min | 小 |
 
 MFA 是 CPU 密集的，`--jobs` 按物理核数给；它和 GPU 训练可以并行跑。
 
 ---
 
-## 6. 质量检查点
+## 7. 质量检查点
 
 合成后建议先跑质检，丢掉读错的片段：
 
@@ -214,7 +265,7 @@ python scripts/make_zh_dataset.py --output data/zh-corpus --stage screen --cer-t
 
 ---
 
-## 7. 已知限制
+## 8. 已知限制
 
 - **声调编码**：调值并入韵母 token（`a1`…`a5`），不单独预测。这是刻意的——声调是词汇信息，文本给定即可。
 - **变调只在标点内生效**：三声连读按整句扫描，跨词时可能过度变调。要更准需接分词（jieba）把作用域限制在词内。
@@ -227,6 +278,6 @@ python scripts/make_zh_dataset.py --output data/zh-corpus --stage screen --cer-t
 
 ---
 
-## 8. 许可
+## 9. 许可
 
 代码与权重沿用 Apache-2.0。语料由 Qwen3-TTS 合成（Apache-2.0），不包含真人录音。
