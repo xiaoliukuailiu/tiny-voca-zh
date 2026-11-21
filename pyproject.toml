@@ -3,24 +3,22 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "tiny-voca"
+name = "tiny-voca-zh"
 version = "0.2.0"
-description = "A 4.5M-parameter two-voice English text-to-speech model trained from scratch"
+description = "A 4.5M-parameter two-voice Mandarin text-to-speech model trained from scratch"
 readme = "README.md"
-authors = [{ name = "Muhammed Nazeem" }]
+authors = [{ name = "xiaoliukuailiu" }]
 license = { text = "Apache-2.0" }
 requires-python = ">=3.10"
 dependencies = ["torch>=2.4,<3", "numpy>=1.24,<3", "soundfile>=0.12,<1"]
 
 [project.optional-dependencies]
-# The "own" front end: text to phonemes without eSpeak.
-own = ["dizione @ git+https://github.com/n4ze3m/dizione"]
 prepare = ["librosa>=0.10.2,<1", "pyarrow>=15", "huggingface-hub>=0.34,<2"]
 # Annotation only: the pretrained phoneme recogniser used for forced alignment.
 annotate = ["transformers>=4.40,<5", "torchaudio>=2.1,<3", "scipy>=1.10,<2", "huggingface-hub>=0.34,<2"]
 # Evaluation only: ASR scoring and comparison with recordings.
 evaluate = ["faster-whisper>=1.0,<2", "jiwer>=3,<5", "librosa>=0.10.2,<1", "scipy>=1.10,<2"]
-# Mandarin front end (TINY_VOCA_LANG=zh). Alignment uses MFA, installed with conda.
+# Mandarin front end (TINY_VOCA_LANG=zh). Alignment uses CTC (default, cross-platform) or MFA (Linux/macOS).
 zh = ["pypinyin>=0.53"]
 
 [project.scripts]
