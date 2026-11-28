@@ -100,6 +100,8 @@ _CJK = re.compile(r"[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]")
 _LATIN_RUN = re.compile(r"[A-Za-z]+")
 
 _DIGITS = "零一二三四五六七八九"
+_YI_KEEP_AFTER = frozenset("第零一二三四五六七八九十百千万亿点")
+_YI_KEEP_BEFORE = frozenset("零一二三四五六七八九十月日号")
 _SMALL_UNITS = ("", "十", "百", "千")
 _BIG_UNITS = ("", "万", "亿")
 
@@ -278,8 +280,19 @@ def apply_sandhi(syllables):
         following = result[index + 1] if index + 1 < count else None
         if item.char == "不" and item.tone == 4 and following and following.tone == 4:
             result[index] = Syllable(item.initial, item.final, 2, item.char)
-        elif item.char == "一" and item.tone == 1:
-            if following is None:
+        elif item.char == "一" and item.tone in (1, 2, 4):
+            # 一 inside a number, an ordinal or a date keeps its first tone:
+            # 十一, 第一, 二零二一年, 一月, 一九九八. Only 一 as a counting
+            # word before a measure (一个, 一起) or multiplying 百 or 千
+            # (一百, 一千一百) changes tone. pypinyin may already have changed
+            # it, so the first tone is restored here.
+            previous = result[index - 1] if index else None
+            multiplier = following is not None and following.char in "百千"
+            if not multiplier and ((previous is not None and previous.char in _YI_KEEP_AFTER)
+                                   or (following is not None and following.char in _YI_KEEP_BEFORE)):
+                result[index] = Syllable(item.initial, item.final, 1, item.char)
+                continue
+            if following is None or item.tone != 1:
                 continue
             if following.tone == 4:
                 result[index] = Syllable(item.initial, item.final, 2, item.char)
