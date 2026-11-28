@@ -95,6 +95,39 @@ class SandhiTest(unittest.TestCase):
         result = apply_sandhi(self.make(("i", 1, "衣"), ("ang", 4, "裳")))
         self.assertEqual([s.tone for s in result], [1, 4])
 
+    def test_yi_after_ordinal_marker_keeps_first_tone(self):
+        # 第一名: 一 is an ordinal, not a counting word before 名.
+        result = apply_sandhi(self.make(("i", 4, "第"), ("i", 1, "一"), ("ing", 2, "名")))
+        self.assertEqual([s.tone for s in result], [4, 1, 2])
+
+    def test_yi_at_the_end_of_a_number_keeps_first_tone(self):
+        # 十一个: 一 is the units digit of eleven.
+        result = apply_sandhi(self.make(("i", 2, "十"), ("i", 1, "一"), ("e", 4, "个")))
+        self.assertEqual([s.tone for s in result], [2, 1, 4])
+
+    def test_yi_in_a_date_keeps_first_tone(self):
+        # 一月 and 一日 are names of a month and a day.
+        result = apply_sandhi(self.make(("i", 1, "一"), ("ve", 4, "月")))
+        self.assertEqual([s.tone for s in result], [1, 4])
+
+    def test_yi_already_changed_upstream_is_restored_in_numbers(self):
+        # pypinyin may hand over 一 with a changed tone; inside a number it goes back to the first tone.
+        result = apply_sandhi(self.make(("i", 4, "第"), ("i", 2, "一"), ("i", 4, "次")))
+        self.assertEqual([s.tone for s in result], [4, 1, 4])
+
+    def test_yi_tones_in_whole_sentences(self):
+        from tiny_voca.zh_text import syllables_of
+        def tones(text):
+            return [s.tone for s in syllables_of(text) if s.char == "一"]
+        self.assertEqual(tones("第一名"), [1])
+        self.assertEqual(tones("十一个人"), [1])
+        self.assertEqual(tones("一月一日"), [1, 1])
+        self.assertEqual(tones("二零二一年"), [1])
+        self.assertEqual(tones("一个"), [2])
+        self.assertEqual(tones("一天"), [4])
+        self.assertEqual(tones("一千一百"), [4, 4])
+        self.assertEqual(tones("一百一十"), [4, 1])
+
 
 class NormalizeTest(unittest.TestCase):
     def test_chinese_punctuation_folds_into_inventory(self):
